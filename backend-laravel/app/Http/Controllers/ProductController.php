@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $product = DB::table('products')->get();
@@ -17,50 +14,38 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
+    public function searchByTags(string $id){
+        $users = DB::table('products')->where('id_tag', $id)->get();
+        return $users;
+    }
     public function show(string $id)
     {
-        return DB::table('products')->find($id);
-        // return $id;
+        $users = DB::table('products')->find($id);
+       
+        // $users = DB::table('products')->where('id_tag', $id)->get();
+        return $users;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //

@@ -36,7 +36,8 @@ Route::put('/users/update/{id}', [UserController::class, 'update']);
 
 // PRODUCT
 Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/search/{id}', [ProductController::class, 'show']);
+Route::get('/products/searchByID/{id}', [ProductController::class, 'show']);
+Route::get('/products/searchTag/{id}', [ProductController::class, 'searchByTags']);
 
 // TAG
 Route::get('/tags', [TagController::class, 'index']);

@@ -14,5 +14,11 @@ use App\Http\Controllers\UserController;
 |
 */
 
-// Route::get('/users', [UserController::class, 'index']);
-Route::view("/{any}", "app")->where("any", ".*");
+Route::get('/', function(){
+    return view('app');
+});
+// Route::view("/{any}", "app")->where("any", ".*");
+
+
+// API USER
+Route::resource('/users', UserController::class);

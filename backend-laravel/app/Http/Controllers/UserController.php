@@ -32,7 +32,13 @@ class UserController extends Controller
                 )
             ->get();
 
-        return $users;
+        // return $users;
+        return view('users/index', compact('users'))->with('i',(request()->input('page', 1) -1) *5);
+    }
+
+
+    public function create(){
+        return view('users/create');
     }
 
 
