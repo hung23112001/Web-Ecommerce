@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;  
@@ -11,13 +12,24 @@ use Illuminate\Support\Facades\DB;
 class UserController extends Controller
 {
     public function login(Request $request) 
-    {
+    {   
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password ]) ){
-            return true;
+            $id = Auth::user()->id; //or Auth::id();
+            $request->session()->put('usersID', $id);
+            return redirect()->route('users.index')->with('message',"Bạn đã đăng nhập thành công");
         }
         else{
-            return "Thông tin tài khoản mật khẩu không chính xác, vui lòng thử lại!!";
+            return redirect()->route('auth.login')->with('message',"Thông tin tài khoản mật khẩu không chính xác");
         }
+    }
+
+    public function logout(Request $request) {
+        // Remove only session
+        // $request->session()->forget('usersID');
+        // Remove all session
+        $request->session()->flush();
+        Auth::logout();
+        return redirect()->route('auth.login')->with('message',"Bạn đã đăng xuất khỏi hệ thống");
     }
 
     public function index()
@@ -36,17 +48,16 @@ class UserController extends Controller
         return view('users/index', compact('users'))->with('i',(request()->input('page', 1) -1) *5);
     }
 
-
     public function create(){
         return view('users/create');
     }
-
 
     public function store(Request $request)
     {
         // Eloquent ORM
         // C1
-        $user = $request->except(["password", "password_confirmation"]);
+        // $user = $request->except(["password", "password_confirmation"]);
+        $user = $request->except(["password"]);
         $user["password"] = Hash::make($request["password"]);
         $user["department_id"] = 2;
         $user["status_id"] = 1;
@@ -65,16 +76,18 @@ class UserController extends Controller
         $check_create = DB::table("users")->whereUsername($request->username)->get()->count();
 
         if($check_create == 1){
-            return true;
+            return redirect()->route('users.index')->with('message',"Đăng ký tài khoản thành công");
         }
         else{
-            return "Lỗi tạo tài khoản. Vui lòng thử lại!!";
+            return redirect()->route('users.create')->with('error',"Lỗi đăng ký, vui lòng thử lại");
         }
     }
 
+    
     public function show(string $id)
     {
-        return User::find($id);
+        $users = User::find($id);
+        return view('users/info', compact('users'))->with('message',"Thông tin tài khoản!");
     }
 
 
@@ -82,21 +95,29 @@ class UserController extends Controller
     {
         $users = User::find($id);
          
-        // ...
+        $departments = DB::table('departments')->get();
+        $users_status = DB::table('users_status')->get();
+        
+        return view('users/edit', compact('users', 'departments', 'users_status'));
+        // return $departments;
     }
 
     public function update(Request $request, string $id)
     {
-        User::find($id)->update([
-            "avatar" => $request->avatar,
+        $user = User::find($id);
+        $request["password"] = Hash::make($request["password"]);
 
-        ]);
+        $user->update($request->all());
+
+        return redirect()->route('users.index')->with('message', "Cập nhật thành công");
     }
 
 
     public function destroy(string $id)
     {
-        //
+        $user = User::find($id);
+        $user->delete();
+        return redirect()->route('users.index')->with('message','Xóa tài khoản thành công');
     }
 }
 

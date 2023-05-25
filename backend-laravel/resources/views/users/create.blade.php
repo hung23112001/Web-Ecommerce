@@ -30,12 +30,13 @@
                                 <strong>Mật khẩu: </strong>
                                 <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu">
                             </div>
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <strong>Xác nhận mật khẩu: </strong>
                                 <input type="password" name="password_confimation" class="form-control" placeholder="Xác nhận mật khẩu">
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
+                    <button class="btn btn-success mt-2">Đăng ký</button>
                 </form>
             </div>
         </div>

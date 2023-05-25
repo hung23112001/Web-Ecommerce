@@ -8,12 +8,26 @@
                     <div class="col-md-6">
                         <h3>Quản lý tài khoản</h3>
                     </div>
+                    
                     <div class="col-md-6">
-                        <a href="{{route('users.create')}}" class="btn btn-primary float-end">Thêm</a>
+                        @if (Session::has('usersID'))
+                            <a href="{{route('users.logout')}}" class="btn btn-primary float-end ">Đăng xuất</a>
+                        @endif
+                        {{-- <a href="{{route('users.create')}}" class="btn btn-primary float-end">Đăng ký tài khoản</a> --}}
+                        <a href="{{route('users.show', Session('usersID') )}}" class="btn btn-primary float-end">Thông tin cá nhân</a>
                     </div>
                 </div>
             </div>
             <div class="card-body">
+                @if (Session::has('message'))
+                    <div class="alert alert-success">
+                        {{Session::get('message')}}
+                    </div>
+                @elseif (Session::has('error'))
+                    <div class="alert alert-danger">
+                        {{Session::get('message')}}
+                    </div>
+                @endif
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -31,10 +45,15 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $item->username }}</td>
                                 <td>{{ $item->email }}</td>
-                                <td>{{ $item->status_id }}</td>
-                                <td>{{ $item->department_id }}</td>
+                                <td>{{ $item->status }}</td>
+                                <td>{{ $item->department }}</td>
                                 <td>
-                                    Sửa
+                                    <form action="{{route('users.destroy', $item->id)}}" method="POST">
+                                        <a href="{{route('users.edit', $item->id)}}" class="btn btn-info">Sửa</a>
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type='submit' class="btn btn-danger">Xóa</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
