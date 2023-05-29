@@ -30,7 +30,19 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        DB::table('tag')->insert([
+            "name" => $request->name,
+            "description" => $request->description,
+        ]);
+
+        $check_create = DB::table("tag")->whereName($request->username)->get()->count();
+
+        if($check_create == 1){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     /**
@@ -49,12 +61,7 @@ class TagController extends Controller
     {
         $info_tags = DB::table('tag')->find($id);
 
-        // return redirect()->json([
-
-        // ]);
-        return view('tags-edit',$info_tags);
-        // return redirect()->route('login');
-
+        return $info_tags;
     }
 
     /**
@@ -62,7 +69,10 @@ class TagController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $info_tags = DB::table('tag')->find($id);
+
+        $info_tags->update($request->all());
+        return $info_tags;
     }
 
     /**
@@ -70,6 +80,16 @@ class TagController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $tags = DB::table('tag')->find($id);
+        $tags->delete();
+        
+        $check_delete = DB::table("tag")->where('id', $id)->get()->count();
+
+        if($check_delete == 1){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }
