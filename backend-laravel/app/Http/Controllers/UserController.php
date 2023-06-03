@@ -19,8 +19,6 @@ class UserController extends Controller
             // $request->session()->put('usersID', $id);
             $users = DB::table('users')->find($id);
             // $department_id = DB::table("users")->where('id', $id)->select('department_id')->get();
-
-            // return redirect()->route('users.index')->with('message',"Bạn đã đăng nhập thành công");
             return [
                 'users' => $users,
                 'message'=> true,
@@ -28,11 +26,8 @@ class UserController extends Controller
         }
         else{
             $message = false;
-            // return redirect()->route('auth.login')->with('message',"Thông tin tài khoản mật khẩu không chính xác");
             return $message;
         }
-        
-        // return $request;
     }
 
     public function logout(Request $request) {
@@ -43,13 +38,14 @@ class UserController extends Controller
         $request->session()->flush();
         Auth::logout();
         return true;
-        // return redirect()->route('auth.login')->with('message',"Bạn đã đăng xuất khỏi hệ thống");
     }
 
     public function index()
     {
-        $users = User::
-            join('departments', 'users.department_id', '=', 'departments.id')
+        // $users = DB::table('users')->get();
+
+        $users = DB::table('users')
+            ->join('departments', 'users.department_id', '=', 'departments.id')
             ->join('users_status', 'users.status_id', '=', 'users_status.id')
             ->select(
                 'users.*', 
@@ -57,10 +53,20 @@ class UserController extends Controller
                 'users_status.name as status'
                 )
             ->get();
-        // $users = DB::table('users')->get();
+
+        // $users = DB::table('users')
+        // ->leftJoin('users_status', 'users.status_id', '=', 'users_status.id')
+        //     // ->join('departments', 'users.department_id', '=', 'departments.id')
+        //     // ->join('users_status', 'users.status_id', '=', 'users_status.id')
+        //     ->select(
+    //             'users.email',
+    //             // 'users.id', 'users.email',
+    //             // 'departments.name as department', 
+    //             'users_status.name'
+        //             )
+        //     ->get();
 
         return $users;
-        // return view('users/index', compact('users'))->with('i',(request()->input('page', 1) -1) *5);
     }
 
     public function create()
@@ -101,23 +107,19 @@ class UserController extends Controller
             "status_id" => 1,
             "department_id" => 2,
             // "username" => $request["username"],
-            "email" => $request["email"],
+            "email" => $request->email,
             "password" => Hash::make($request["password"])
         ]);
 
         // $get = DB::table("users")->whereUsername($request->username)->get()->count();
 
-        
-
         $check_create = DB::table("users")->whereUsername($request->username)->get()->count();
 
         if($check_create == 1){
-            // return redirect()->route('auth.login')->with('message',"Đăng ký tài khoản thành công");
             return true;
         }
         else{
             return false;
-            // return redirect()->route('users.create')->with('error',"Lỗi đăng ký, vui lòng thử lại");
         }
     }
 
@@ -126,7 +128,6 @@ class UserController extends Controller
     {
         $users = DB::table('users')->find($id);
         return $users;
-        // return view('users/info', compact('users'))->with('message',"Thông tin tài khoản!");
     }
 
 
@@ -137,18 +138,17 @@ class UserController extends Controller
         $departments = DB::table('departments')->get();
         $users_status = DB::table('users_status')->get();
         
-        // return view('users/edit', compact('users', 'departments', 'users_status'));
-        return $users;
+        return [ $users, $departments, $users_status ];
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        $users = DB::table('users')->find($id);
-        $request["password"] = Hash::make($request["password"]);
+        $users = DB::table('users')
+        ->where('id', $request->id)
+        ->update(["department_id" => $request->department_id,
+                    "status_id" => $request->status_id
+                ]);
 
-        $users->update($request->all());
-
-        // return redirect()->route('users.index')->with('message', "Cập nhật thành công");
         return $users;
     }
 
@@ -166,21 +166,5 @@ class UserController extends Controller
         else{
             return true;
         }
-        // return redirect()->route('users.index')->with('message','Xóa tài khoản thành công');
     }
 }
-
-
-        // $validated = $request->validate([
-        //     "username" => "required|unique:users,username",
-        //     "email" => "required|email|unique:users,email",
-        //     "password" => "required|confirmed",
-        // ],[
-        //     "username.required" => "Nhập tên tài khoản",
-        //     "username.unique" => "Tên tài khoản đã tồn tại",
-        //     "email.required" => "Nhập email",
-        //     "email.unique" => "Email đã tồn tại",
-        //     "email.email" => "Định dạng email không hợp lệ",
-        //     "password.required" => "Nhập mật khẩu",
-        //     "password.confirmed" => "Mật khẩu không trùng khớp",
-        // ]);

@@ -14,10 +14,10 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::get('/', function(){
-    return view('auth/login');
-})->name('auth.login');
-// Route::view("/{any}", "app")->where("any", ".*");
+// Route::get('/', function(){
+//     return view('auth/login');
+// })->name('auth.login');
+Route::view("/{any}", "app")->where("any", ".*");
 
 
 // API USER
