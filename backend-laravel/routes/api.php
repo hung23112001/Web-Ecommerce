@@ -32,7 +32,9 @@ Route::post('/users/register', [UserController::class, 'store']);
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/search/{id}', [UserController::class, 'show']);
 Route::get('/users/edit/{id}', [UserController::class, 'edit']);
-Route::put('/users/update/{id}', [UserController::class, 'update']);
+Route::put('/users/update', [UserController::class, 'update']);
+Route::put('/users/changePassword', [UserController::class, 'changePassword']);
+
 
 // PRODUCT
 Route::get('/products', [ProductController::class, 'index']);

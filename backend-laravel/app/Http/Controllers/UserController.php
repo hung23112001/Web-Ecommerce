@@ -7,12 +7,12 @@ use App\Models\User;
 use Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;  
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    public function login(Request $request) 
-    {   
+    public function login(Request $request)
+    {
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password ]) ){
             $id = Auth::user()->id;
 
@@ -48,21 +48,22 @@ class UserController extends Controller
             ->join('departments', 'users.department_id', '=', 'departments.id')
             ->join('users_status', 'users.status_id', '=', 'users_status.id')
             ->select(
-                'users.*', 
-                'departments.name as department', 
+                'users.*',
+                'departments.name as department',
                 'users_status.name as status'
                 )
+            ->orderBy('id', 'asc')
             ->get();
 
         // $users = DB::table('users')
         // ->leftJoin('users_status', 'users.status_id', '=', 'users_status.id')
         //     // ->join('departments', 'users.department_id', '=', 'departments.id')
         //     // ->join('users_status', 'users.status_id', '=', 'users_status.id')
-        //     ->select(
-    //             'users.email',
-    //             // 'users.id', 'users.email',
-    //             // 'departments.name as department', 
-    //             'users_status.name'
+            // ->select(
+            //     'users.*',
+            //     'departments.name as department',
+            //     'users_status.name as status'
+            //     )
         //             )
         //     ->get();
 
@@ -106,7 +107,6 @@ class UserController extends Controller
         DB::table('users')->insert([
             "status_id" => 1,
             "department_id" => 2,
-            // "username" => $request["username"],
             "email" => $request->email,
             "password" => Hash::make($request["password"])
         ]);
@@ -123,7 +123,7 @@ class UserController extends Controller
         }
     }
 
-    
+
     public function show(string $id)
     {
         $users = DB::table('users')->find($id);
@@ -134,10 +134,10 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $users = DB::table('users')->find($id);
-         
+
         $departments = DB::table('departments')->get();
         $users_status = DB::table('users_status')->get();
-        
+
         return [ $users, $departments, $users_status ];
     }
 
@@ -152,12 +152,34 @@ class UserController extends Controller
         return $users;
     }
 
+    public function changePassword(Request $request)
+    {
+        $usersCurrent = DB::table('users')->find($request->id);
+
+        if(Auth::attempt(['email' => $usersCurrent->email, 'password' => $request->currentPass ])){
+            $usersCurrent = DB::table('users')
+            ->where('id', $request->id)
+            ->update(["password" => Hash::make($request->newPass)]);
+            return [
+                'message'=>'Đổi mật khẩu thành công',
+                'result'=>true
+            ];
+        }
+        else{
+            return [
+                'message'=>'Mật khẩu nhập vào không chính xác',
+                'result'=>false
+            ];
+        }
+        // return $request;
+    }
+
 
     public function destroy(string $id)
     {
         $users = DB::table('users')->find($id);
         $users->delete();
-        
+
         $check_delete = DB::table("users")->where('id', $id)->get()->count();
 
         if($check_delete == 1){
