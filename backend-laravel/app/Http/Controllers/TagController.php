@@ -30,7 +30,12 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $query_insert = DB::table('tag')->insert([
+            "name" => $request->nameTag,
+            "description" => $request->descriptionTag,
+        ]);
+
+        return $query_insert;
     }
 
     /**
@@ -47,22 +52,21 @@ class TagController extends Controller
      */
     public function edit(string $id)
     {
-        $info_tags = DB::table('tag')->find($id);
-
-        // return redirect()->json([
-
-        // ]);
-        return view('tags-edit',$info_tags);
-        // return redirect()->route('login');
-
+        // return DB::table('tag')->find($id);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $query_updateTag = DB::table('tag')
+        ->where('id', $request->id)
+        ->update(["name" => $request->nameTag_new,
+                    "description" => $request->descriptionTag_new
+                ]);
+
+        return $query_updateTag;
     }
 
     /**
@@ -70,6 +74,15 @@ class TagController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $tags = DB::table('tag')->where('id', $id)->delete();
+        // $query_delete = $tags->delete();
+        
+        // if ($query_delete > 0) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
+        return $tags;
     }
 }
+

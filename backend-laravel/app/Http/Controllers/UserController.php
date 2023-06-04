@@ -7,131 +7,200 @@ use App\Models\User;
 use Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;  
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    public function login(Request $request) 
-    {   
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password ]) ){
-            $id = Auth::user()->id; //or Auth::id();
-            $request->session()->put('usersID', $id);
-            return redirect()->route('users.index')->with('message',"Bạn đã đăng nhập thành công");
+    public function login(Request $request)
+    {
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password ]) ){
+            $id = Auth::user()->id;
+            $users = DB::table('users')->find($id);
+
+            // $request->session()->put('usersID', $id);
+            // $department_id = DB::table("users")->where('id', $id)->select('department_id')->get();
+            return [
+                'users' => $users,
+                'message'=> true,
+            ];
+            // return response()->json(['user' => $users, 'message'=> true]);
         }
         else{
-            return redirect()->route('auth.login')->with('message',"Thông tin tài khoản mật khẩu không chính xác");
+            $message = false;
+            return $message;
         }
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request) 
+    {
         // Remove only session
         // $request->session()->forget('usersID');
+
         // Remove all session
-        $request->session()->flush();
+        // $request->session()->flush();
         Auth::logout();
-        return redirect()->route('auth.login')->with('message',"Bạn đã đăng xuất khỏi hệ thống");
+        return [
+            'message'=> 'Đăng xuất thành công',
+        ];
     }
 
     public function index()
     {
-        $users = User::
-            join('departments', 'users.department_id', '=', 'departments.id')
+        // $users = DB::table('users')->get();
+
+        $users = DB::table('users')
+            ->join('departments', 'users.department_id', '=', 'departments.id')
             ->join('users_status', 'users.status_id', '=', 'users_status.id')
             ->select(
-                'users.*', 
-                'departments.name as department', 
+                'users.*',
+                'departments.name as department',
                 'users_status.name as status'
                 )
+            ->orderBy('id', 'asc')
             ->get();
 
-        // return $users;
-        return view('users/index', compact('users'))->with('i',(request()->input('page', 1) -1) *5);
+        // $users = DB::table('users')
+        // ->leftJoin('users_status', 'users.status_id', '=', 'users_status.id')
+        //     // ->join('departments', 'users.department_id', '=', 'departments.id')
+        //     // ->join('users_status', 'users.status_id', '=', 'users_status.id')
+            // ->select(
+            //     'users.*',
+            //     'departments.name as department',
+            //     'users_status.name as status'
+            //     )
+        //             )
+        //     ->get();
+
+        return $users;
     }
 
-    public function create(){
-        return view('users/create');
+    public function create()
+    {
     }
 
     public function store(Request $request)
     {
+        // AVATAR
+        // if($request->has('avatar')){
+        //     $file = $request->avatar;
+        //     $file_name = $file->getClientoriginalName();
+        //     // dd($file_name);
+        //     $file->move(public_path('uploads'), $file_name);
+        // }
+        // dd($request->all());
+
         // Eloquent ORM
         // C1
         // $user = $request->except(["password", "password_confirmation"]);
-        $user = $request->except(["password"]);
-        $user["password"] = Hash::make($request["password"]);
-        $user["department_id"] = 2;
-        $user["status_id"] = 1;
-
-        User::create($user);
-        // // C2
-        // User::create([
-        //     "status_id" => 1,
-        //     "department_id" => 2,
-        //     "username" => $request["username"],
-        //     "email" => $request["email"],
-        //     "password" => Hash::make($request["password"])
-        // ]);
+        // $user = $request->except(["password"]);
+        // $user["password"] = Hash::make($request["password"]);
+        // $user["department_id"] = 2;
+        // $user["status_id"] = 1;
+        // User::create($user);
+        // C2
+        // // User::create([
+        // //     "status_id" => 1,
+        // //     "department_id" => 2,
+        // //     "username" => $request["username"],
+        // //     "email" => $request["email"],
+        // //     "password" => Hash::make($request["password"])
+        // // ]);
 
         // Query Builder
+        DB::table('users')->insert([
+            "status_id" => 1,
+            "department_id" => 2,
+            "email" => $request->email,
+            "password" => Hash::make($request["password"])
+        ]);
+
+        // $get = DB::table("users")->whereUsername($request->username)->get()->count();
+
         $check_create = DB::table("users")->whereUsername($request->username)->get()->count();
 
         if($check_create == 1){
-            return redirect()->route('users.index')->with('message',"Đăng ký tài khoản thành công");
+            return true;
         }
         else{
-            return redirect()->route('users.create')->with('error',"Lỗi đăng ký, vui lòng thử lại");
+            return false;
         }
     }
 
-    
     public function show(string $id)
     {
-        $users = User::find($id);
-        return view('users/info', compact('users'))->with('message',"Thông tin tài khoản!");
+        $users = DB::table('users')->find($id);
+        return $users;
     }
-
 
     public function edit(string $id)
     {
-        $users = User::find($id);
-         
+        $users = DB::table('users')->find($id);
+
         $departments = DB::table('departments')->get();
         $users_status = DB::table('users_status')->get();
-        
-        return view('users/edit', compact('users', 'departments', 'users_status'));
-        // return $departments;
+
+        return [ $users, $departments, $users_status ];
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        $user = User::find($id);
-        $request["password"] = Hash::make($request["password"]);
+        $users = DB::table('users')
+        ->where('id', $request->id)
+        ->update(["department_id" => $request->department_id,
+                    "status_id" => $request->status_id
+                ]);
 
-        $user->update($request->all());
+        if($users > 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
-        return redirect()->route('users.index')->with('message', "Cập nhật thành công");
+    public function changePassword(Request $request)
+    {
+        $usersCurrent = DB::table('users')->find($request->id);
+
+        if(Auth::attempt(['email' => $usersCurrent->email, 'password' => $request->currentPass ])){
+            $usersCurrent = DB::table('users')
+            ->where('id', $request->id)
+            ->update(["password" => Hash::make($request->newPass)]);
+            if($usersCurrent > 0){
+                return [
+                    'message'=>'Đổi mật khẩu thành công',
+                    'result'=>true
+                ];
+            }
+            else{
+                return [
+                    'message'=>'Lỗi cập nhật vui lòng thử lại',
+                    'result'=>false
+                ];
+            }
+        }
+        else{
+            return [
+                'message'=>'Mật khẩu nhập vào không chính xác',
+                'result'=>false
+            ];
+        }
+        // return $request;
     }
 
 
     public function destroy(string $id)
     {
-        $user = User::find($id);
-        $user->delete();
-        return redirect()->route('users.index')->with('message','Xóa tài khoản thành công');
+        $users = DB::table('users')->find($id);
+        $users->delete();
+
+        $check_delete = DB::table("users")->where('id', $id)->get()->count();
+
+        if($check_delete == 1){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }
-
-
-        // $validated = $request->validate([
-        //     "username" => "required|unique:users,username",
-        //     "email" => "required|email|unique:users,email",
-        //     "password" => "required|confirmed",
-        // ],[
-        //     "username.required" => "Nhập tên tài khoản",
-        //     "username.unique" => "Tên tài khoản đã tồn tại",
-        //     "email.required" => "Nhập email",
-        //     "email.unique" => "Email đã tồn tại",
-        //     "email.email" => "Định dạng email không hợp lệ",
-        //     "password.required" => "Nhập mật khẩu",
-        //     "password.confirmed" => "Mật khẩu không trùng khớp",
-        // ]);

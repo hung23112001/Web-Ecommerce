@@ -28,11 +28,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // API USER
 Route::post('/users/login', [UserController::class, 'login']);
 Route::post('/users/register', [UserController::class, 'store']);
+Route::post('/users/logout', [UserController::class, 'logout']);
+
 
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/search/{id}', [UserController::class, 'show']);
 Route::get('/users/edit/{id}', [UserController::class, 'edit']);
-Route::put('/users/update/{id}', [UserController::class, 'update']);
+Route::put('/users/update', [UserController::class, 'update']);
+Route::put('/users/changePassword', [UserController::class, 'changePassword']);
+
 
 // PRODUCT
 Route::get('/products', [ProductController::class, 'index']);
@@ -42,8 +46,9 @@ Route::get('/products/searchTag/{id}', [ProductController::class, 'searchByTags'
 // TAG
 Route::get('/tags', [TagController::class, 'index']);
 Route::get('/tags/search/{id}', [TagController::class, 'show']);
-Route::get('/tags/edit/{id}', [TagController::class, 'edit']);
-Route::put('/tags/update/{id}', [TagController::class, 'update']);
+Route::post('/tags/add', [TagController::class, 'store']);
+Route::put('/tags/update', [TagController::class, 'update']);
+Route::delete('/tags/delete/{id}', [TagController::class, 'destroy']);
 
 
 // DEPARTMENTS
