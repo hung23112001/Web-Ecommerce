@@ -15,14 +15,15 @@ class UserController extends Controller
     {
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password ]) ){
             $id = Auth::user()->id;
+            $users = DB::table('users')->find($id);
 
             // $request->session()->put('usersID', $id);
-            $users = DB::table('users')->find($id);
             // $department_id = DB::table("users")->where('id', $id)->select('department_id')->get();
             return [
                 'users' => $users,
                 'message'=> true,
             ];
+            // return response()->json(['user' => $users, 'message'=> true]);
         }
         else{
             $message = false;
@@ -30,14 +31,17 @@ class UserController extends Controller
         }
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request) 
+    {
         // Remove only session
         // $request->session()->forget('usersID');
 
         // Remove all session
-        $request->session()->flush();
+        // $request->session()->flush();
         Auth::logout();
-        return true;
+        return [
+            'message'=> 'Đăng xuất thành công',
+        ];
     }
 
     public function index()
@@ -72,7 +76,6 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('auth/register');
     }
 
     public function store(Request $request)
@@ -123,13 +126,11 @@ class UserController extends Controller
         }
     }
 
-
     public function show(string $id)
     {
         $users = DB::table('users')->find($id);
         return $users;
     }
-
 
     public function edit(string $id)
     {
@@ -149,7 +150,12 @@ class UserController extends Controller
                     "status_id" => $request->status_id
                 ]);
 
-        return $users;
+        if($users > 0){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     public function changePassword(Request $request)
@@ -160,10 +166,18 @@ class UserController extends Controller
             $usersCurrent = DB::table('users')
             ->where('id', $request->id)
             ->update(["password" => Hash::make($request->newPass)]);
-            return [
-                'message'=>'Đổi mật khẩu thành công',
-                'result'=>true
-            ];
+            if($usersCurrent > 0){
+                return [
+                    'message'=>'Đổi mật khẩu thành công',
+                    'result'=>true
+                ];
+            }
+            else{
+                return [
+                    'message'=>'Lỗi cập nhật vui lòng thử lại',
+                    'result'=>false
+                ];
+            }
         }
         else{
             return [

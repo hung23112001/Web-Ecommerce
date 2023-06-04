@@ -30,19 +30,12 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        DB::table('tag')->insert([
-            "name" => $request->name,
-            "description" => $request->description,
+        $query_insert = DB::table('tag')->insert([
+            "name" => $request->nameTag,
+            "description" => $request->descriptionTag,
         ]);
 
-        $check_create = DB::table("tag")->whereName($request->username)->get()->count();
-
-        if($check_create == 1){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return $query_insert;
     }
 
     /**
@@ -59,20 +52,21 @@ class TagController extends Controller
      */
     public function edit(string $id)
     {
-        $info_tags = DB::table('tag')->find($id);
-
-        return $info_tags;
+        // return DB::table('tag')->find($id);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        $info_tags = DB::table('tag')->find($id);
+        $query_updateTag = DB::table('tag')
+        ->where('id', $request->id)
+        ->update(["name" => $request->nameTag_new,
+                    "description" => $request->descriptionTag_new
+                ]);
 
-        $info_tags->update($request->all());
-        return $info_tags;
+        return $query_updateTag;
     }
 
     /**
@@ -80,16 +74,15 @@ class TagController extends Controller
      */
     public function destroy(string $id)
     {
-        $tags = DB::table('tag')->find($id);
-        $tags->delete();
+        $tags = DB::table('tag')->where('id', $id)->delete();
+        // $query_delete = $tags->delete();
         
-        $check_delete = DB::table("tag")->where('id', $id)->get()->count();
-
-        if($check_delete == 1){
-            return false;
-        }
-        else{
-            return true;
-        }
+        // if ($query_delete > 0) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
+        return $tags;
     }
 }
+
