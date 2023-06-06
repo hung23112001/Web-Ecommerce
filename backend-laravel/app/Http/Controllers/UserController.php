@@ -13,24 +13,44 @@ class UserController extends Controller
 {
     public function login(Request $request)
     {
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password ]) ){
-            $id = Auth::user()->id;
-            $users = DB::table('users')->find($id);
+        // if (Auth::attempt(['email' => $request->email, 'password' => $request->password ]) ){
+        //     $id = Auth::user()->id;
+        //     $users = DB::table('users')->find($id);
 
-            // $request->session()->put('usersID', $id);
-            // $department_id = DB::table("users")->where('id', $id)->select('department_id')->get();
-            return [
-                'users' => $users,
-                'message'=> true,
-            ];
-            // return response()->json(['user' => $users, 'message'=> true]);
-        }
-        else{
-            $message = false;
-            return $message;
-        }
+        //     // $request->session()->put('usersID', $id);
+        //     // $department_id = DB::table("users")->where('id', $id)->select('department_id')->get();
+        //     return [
+        //         'users' => $users,
+        //         'message'=> true,
+        //     ];
+        //     // return response()->json(['user' => $users, 'message'=> true]);
+        // }
+        // else{
+        //     $message = false;
+        //     return $message;
+        // }
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+            'message' => 'Invalid login details'
+                    ], 401);
+            }
+    
+            $user = User::where('email', $request['email'])->firstOrFail();
+    
+            $token = $user->createToken('auth_token')->plainTextToken;
+    
+            return response()->json([
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+            ]);
     }
-
+    public function me(Request $request)
+    {
+        $user = Auth::user();
+        return response()->json([
+            'user' => $user,
+        ]);
+    }
     public function logout(Request $request) 
     {
         // Remove only session

@@ -57,3 +57,8 @@ Route::get('/departments/search/{id}', [DepartmentController::class, 'show']);
 
 // CATEGORY
 Route::get('/categories', [CategoryController::class, 'index']);
+
+
+// ME
+Route::get('/me', [UserController::class, 'me']);
+
