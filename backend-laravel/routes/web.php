@@ -21,6 +21,6 @@ Route::view("/{any}", "app")->where("any", ".*");
 
 
 // API USER
-Route::resource('/users', UserController::class);
-Route::post('/login', [UserController::class, 'login'])->name('users.login');
-Route::get('/logout', [UserController::class, 'logout'])->name('users.logout');
+// Route::resource('/users', UserController::class);
+// Route::post('/login', [UserController::class, 'login'])->name('users.login');
+// Route::get('/logout', [UserController::class, 'logout'])->name('users.logout');

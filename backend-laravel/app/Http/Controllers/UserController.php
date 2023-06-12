@@ -36,17 +36,22 @@ class UserController extends Controller
             }
     
             $user = User::where('email', $request['email'])->firstOrFail();
-    
+            
             $token = $user->createToken('auth_token')->plainTextToken;
     
             return response()->json([
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-            ]);
+                    'status' => 200,
+                    'data' => [
+                        'access_token' => $token,
+                        'token_type' => 'Bearer',
+                        'user' =>  $user
+                    ]
+                    
+            ], 200);
     }
     public function me(Request $request)
     {
-        $user = Auth::user();
+        $user = auth(sanctum)->user();
         return response()->json([
             'user' => $user,
         ]);

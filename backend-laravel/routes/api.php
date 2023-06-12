@@ -60,5 +60,5 @@ Route::get('/categories', [CategoryController::class, 'index']);
 
 
 // ME
-Route::get('/me', [UserController::class, 'me']);
+// Route::get('/me', [UserController::class, 'me']);
 
