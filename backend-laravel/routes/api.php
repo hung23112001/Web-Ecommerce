@@ -25,40 +25,35 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
+
 // API USER
-Route::post('/users/login', [UserController::class, 'login']);
-Route::post('/users/register', [UserController::class, 'store']);
-Route::post('/users/logout', [UserController::class, 'logout']);
+
+Route::prefix('users')->group(function () {
+    Route::post('/login', [UserController::class, 'login']);
+    Route::post('/register', [UserController::class, 'register']);
+    Route::post('/logout', [UserController::class, 'logout']);
+    
+    Route::get('/', [UserController::class, 'index']);
+    Route::get('/search/{id}', [UserController::class, 'show']);
+    Route::get('/edit/{id}', [UserController::class, 'show']);
+    Route::put('/update', [UserController::class, 'update']);
+    Route::put('/changePassword', [UserController::class, 'changePassword']);
+});
 
 
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/users/search/{id}', [UserController::class, 'show']);
-Route::get('/users/edit/{id}', [UserController::class, 'edit']);
-Route::put('/users/update', [UserController::class, 'update']);
-Route::put('/users/changePassword', [UserController::class, 'changePassword']);
+Route::prefix('products')->group(function () {
+    Route::get('/', [ProductController::class, 'index']);
+    Route::get('/searchByID/{id}', [ProductController::class, 'show']);
+    Route::get('/searchTag/{id}', [ProductController::class, 'searchByTags']);
+});
 
 
-// PRODUCT
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/searchByID/{id}', [ProductController::class, 'show']);
-Route::get('/products/searchTag/{id}', [ProductController::class, 'searchByTags']);
+Route::prefix('tags')->group(function () {
+    Route::get('/', [TagController::class, 'index']);
+    Route::get('/search/{id}', [TagController::class, 'show']);
+    Route::post('/add', [TagController::class, 'store']);
+    Route::put('/update', [TagController::class, 'update']);
+    Route::delete('/delete/{id}', [TagController::class, 'destroy']);
+});
 
-// TAG
-Route::get('/tags', [TagController::class, 'index']);
-Route::get('/tags/search/{id}', [TagController::class, 'show']);
-Route::post('/tags/add', [TagController::class, 'store']);
-Route::put('/tags/update', [TagController::class, 'update']);
-Route::delete('/tags/delete/{id}', [TagController::class, 'destroy']);
-
-
-// DEPARTMENTS
-Route::get('/departments', [DepartmentController::class, 'index']);
-Route::get('/departments/search/{id}', [DepartmentController::class, 'show']);
-
-// CATEGORY
-Route::get('/categories', [CategoryController::class, 'index']);
-
-
-// ME
-// Route::get('/me', [UserController::class, 'me']);
 

@@ -25,7 +25,7 @@ class ProductController extends Controller
     }
 
     public function searchByTags(string $id){
-        $users = DB::table('products')->where('id_tag', $id)->get();
+        $users = DB::table('products')->where('tag_id', $id)->get();
         return $users;
     }
     public function show(string $id)

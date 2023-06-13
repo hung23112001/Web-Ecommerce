@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('customer', function (Blueprint $table) {
-            $table->foreignId('id_users')->constrained("users");
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name',50);
+            $table->boolean('status');
+            $table->timestamps();
         });
     }
 
@@ -21,10 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('customer', function (Blueprint $table) {
-            $table->dropForeign('customer_id_users_foreign');
-
-            $table->dropColumn('id_users');
-        });
+        Schema::dropIfExists('tags');
     }
 };

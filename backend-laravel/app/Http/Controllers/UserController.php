@@ -8,61 +8,47 @@ use Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    public function register(Request $request) {
+        $user = DB::table('users')->insert([
+            "email" => $request->email,
+            "password" => Hash::make($request->password),
+            "role" => 1, 
+            "username" => $request->username,
+            "status" => 0,
+        ]);
+        if($user == 1){
+            return true;
+        }
+        return false;
+
+    }
     public function login(Request $request)
     {
-        // if (Auth::attempt(['email' => $request->email, 'password' => $request->password ]) ){
-        //     $id = Auth::user()->id;
-        //     $users = DB::table('users')->find($id);
-
-        //     // $request->session()->put('usersID', $id);
-        //     // $department_id = DB::table("users")->where('id', $id)->select('department_id')->get();
-        //     return [
-        //         'users' => $users,
-        //         'message'=> true,
-        //     ];
-        //     // return response()->json(['user' => $users, 'message'=> true]);
-        // }
-        // else{
-        //     $message = false;
-        //     return $message;
-        // }
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
             'message' => 'Invalid login details'
                     ], 401);
-            }
-    
-            $user = User::where('email', $request['email'])->firstOrFail();
-            
-            $token = $user->createToken('auth_token')->plainTextToken;
-    
-            return response()->json([
-                    'status' => 200,
-                    'data' => [
-                        'access_token' => $token,
-                        'token_type' => 'Bearer',
-                        'user' =>  $user
-                    ]
-                    
-            ], 200);
-    }
-    public function me(Request $request)
-    {
-        $user = auth(sanctum)->user();
+        }
+        $user = User::where('email', $request['email'])->firstOrFail();
+        
+        // return $user;
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
-            'user' => $user,
-        ]);
+            'status' => 200,
+            'data' => [
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' =>  $user
+            ]
+        ], 200);
     }
     public function logout(Request $request) 
     {
-        // Remove only session
-        // $request->session()->forget('usersID');
-
-        // Remove all session
-        // $request->session()->flush();
         Auth::logout();
         return [
             'message'=> 'Đăng xuất thành công',
@@ -71,30 +57,9 @@ class UserController extends Controller
 
     public function index()
     {
-        // $users = DB::table('users')->get();
-
         $users = DB::table('users')
-            ->join('departments', 'users.department_id', '=', 'departments.id')
-            ->join('users_status', 'users.status_id', '=', 'users_status.id')
-            ->select(
-                'users.*',
-                'departments.name as department',
-                'users_status.name as status'
-                )
             ->orderBy('id', 'asc')
             ->get();
-
-        // $users = DB::table('users')
-        // ->leftJoin('users_status', 'users.status_id', '=', 'users_status.id')
-        //     // ->join('departments', 'users.department_id', '=', 'departments.id')
-        //     // ->join('users_status', 'users.status_id', '=', 'users_status.id')
-            // ->select(
-            //     'users.*',
-            //     'departments.name as department',
-            //     'users_status.name as status'
-            //     )
-        //             )
-        //     ->get();
 
         return $users;
     }
@@ -112,34 +77,14 @@ class UserController extends Controller
         //     // dd($file_name);
         //     $file->move(public_path('uploads'), $file_name);
         // }
-        // dd($request->all());
-
-        // Eloquent ORM
-        // C1
-        // $user = $request->except(["password", "password_confirmation"]);
-        // $user = $request->except(["password"]);
-        // $user["password"] = Hash::make($request["password"]);
-        // $user["department_id"] = 2;
-        // $user["status_id"] = 1;
-        // User::create($user);
-        // C2
-        // // User::create([
-        // //     "status_id" => 1,
-        // //     "department_id" => 2,
-        // //     "username" => $request["username"],
-        // //     "email" => $request["email"],
-        // //     "password" => Hash::make($request["password"])
-        // // ]);
 
         // Query Builder
         DB::table('users')->insert([
-            "status_id" => 1,
-            "department_id" => 2,
+            "status" => 1,
+            "role" => 2,
             "email" => $request->email,
             "password" => Hash::make($request["password"])
         ]);
-
-        // $get = DB::table("users")->whereUsername($request->username)->get()->count();
 
         $check_create = DB::table("users")->whereUsername($request->username)->get()->count();
 
@@ -156,31 +101,14 @@ class UserController extends Controller
         $users = DB::table('users')->find($id);
         return $users;
     }
-
     public function edit(string $id)
     {
-        $users = DB::table('users')->find($id);
 
-        $departments = DB::table('departments')->get();
-        $users_status = DB::table('users_status')->get();
-
-        return [ $users, $departments, $users_status ];
     }
 
     public function update(Request $request)
     {
-        $users = DB::table('users')
-        ->where('id', $request->id)
-        ->update(["department_id" => $request->department_id,
-                    "status_id" => $request->status_id
-                ]);
 
-        if($users > 0){
-            return true;
-        }
-        else{
-            return false;
-        }
     }
 
     public function changePassword(Request $request)
@@ -212,8 +140,6 @@ class UserController extends Controller
         }
         // return $request;
     }
-
-
     public function destroy(string $id)
     {
         $users = DB::table('users')->find($id);

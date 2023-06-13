@@ -12,7 +12,7 @@ class TagController extends Controller
      */
     public function index()
     {
-        $tags = DB::table('tag')->get();
+        $tags = DB::table('tags')->get();
 
         return $tags;
     }
@@ -30,7 +30,7 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        $query_insert = DB::table('tag')->insert([
+        $query_insert = DB::table('tags')->insert([
             "name" => $request->nameTag,
             "description" => $request->descriptionTag,
         ]);
@@ -43,7 +43,7 @@ class TagController extends Controller
      */
     public function show(string $id)
     {
-        return DB::table('tag')->find($id);
+        return DB::table('tags')->find($id);
     }
     
 
@@ -60,7 +60,7 @@ class TagController extends Controller
      */
     public function update(Request $request)
     {
-        $query_updateTag = DB::table('tag')
+        $query_updateTag = DB::table('tags')
         ->where('id', $request->id)
         ->update(["name" => $request->nameTag_new,
                     "description" => $request->descriptionTag_new
@@ -74,14 +74,8 @@ class TagController extends Controller
      */
     public function destroy(string $id)
     {
-        $tags = DB::table('tag')->where('id', $id)->delete();
-        // $query_delete = $tags->delete();
-        
-        // if ($query_delete > 0) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
+        $tags = DB::table('tags')->where('id', $id)->delete();
+
         return $tags;
     }
 }
