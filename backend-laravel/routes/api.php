@@ -5,8 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TagController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,15 +23,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-
-
-// API USER
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
 
 Route::prefix('users')->group(function () {
-    Route::post('/login', [UserController::class, 'login']);
-    Route::post('/register', [UserController::class, 'register']);
-    Route::post('/logout', [UserController::class, 'logout']);
-    
     Route::get('/', [UserController::class, 'index']);
     Route::get('/search/{id}', [UserController::class, 'show']);
     Route::get('/edit/{id}', [UserController::class, 'show']);
@@ -40,13 +37,11 @@ Route::prefix('users')->group(function () {
     Route::put('/changePassword', [UserController::class, 'changePassword']);
 });
 
-
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index']);
     Route::get('/searchByID/{id}', [ProductController::class, 'show']);
     Route::get('/searchTag/{id}', [ProductController::class, 'searchByTags']);
 });
-
 
 Route::prefix('tags')->group(function () {
     Route::get('/', [TagController::class, 'index']);

@@ -14,13 +14,4 @@ use App\Http\Controllers\UserController;
 |
 */
 
-// Route::get('/', function(){
-//     return view('auth/login');
-// })->name('auth.login');
 Route::view("/{any}", "app")->where("any", ".*");
-
-
-// API USER
-// Route::resource('/users', UserController::class);
-// Route::post('/login', [UserController::class, 'login'])->name('users.login');
-// Route::get('/logout', [UserController::class, 'logout'])->name('users.logout');
