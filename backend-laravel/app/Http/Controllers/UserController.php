@@ -22,7 +22,11 @@ class UserController extends Controller
     }
     public function update(Request $request)
     {
+        $query = DB::table('users')
+        ->where('id', $request->id)
+        ->update(["role" => $request->role, "status" => $request->status]);
 
+        return $query;
     }
     public function changePassword(Request $request)
     {
@@ -54,14 +58,6 @@ class UserController extends Controller
     }
     public function destroy(string $id)
     {
-        $user = DB::table('users')->find($id);
-        $user->delete();
-        $checkQuery = DB::table("users")->where('id', $id)->get()->count();
-        if($checkQuery > 0){
-            return false;
-        }
-        else{
-            return true;
-        }
+        return DB::table('users')->where('id', $id)->delete();
     }
 }

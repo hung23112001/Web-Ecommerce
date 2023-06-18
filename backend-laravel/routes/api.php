@@ -37,6 +37,7 @@ Route::prefix('users')->group(function () {
     Route::get('/edit/{id}', [UserController::class, 'show']);
     Route::put('/update', [UserController::class, 'update']);
     Route::put('/changePassword', [UserController::class, 'changePassword']);
+    Route::delete('/delete/{id}', [UserController::class, 'destroy']);
 });
 
 Route::prefix('products')->group(function () {
