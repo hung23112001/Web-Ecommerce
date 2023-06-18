@@ -9,12 +9,29 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = DB::table('products')->get();
-        return response()->json($products);
+        $product = DB::table('products')
+            ->join('tags', 'products.tag_id', '=', 'tags.id')
+            ->select('products.*', 'tags.name as tag_name')
+            ->get();
+        return response()->json($product);
     }
     public function store(Request $request)
     {
-        //
+        // return $request->product['name'];
+        $product_new = $request->product;
+        $query = DB::table('products')->insert([
+            'name' => $product_new['name'], 
+            'image' => $product_new['image'],
+            'quantity' => $product_new['quantity'],
+            'price' => $product_new['price'],
+            'description' => $product_new['description'],
+            'rate' => 5,
+            'tag_id' => $product_new['tag_id'],
+            'onSale' => $product_new['onSale'],
+            'news' => $product_new['news'],
+        ]);
+        return $query;
+
     }
     public function searchByTags(string $id){
         $product = DB::table('products')->where('tag_id', $id)->get();
@@ -25,9 +42,23 @@ class ProductController extends Controller
         $product = DB::table('products')->find($id);
         return $product;
     }
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        // $query = $request->id;
+        $query = DB::table('products')
+        ->where('id', $request->id)
+        ->update([
+            "name" => $request->name,
+            "image" => $request->image,
+            "quantity" => $request->quantity,
+            "price" => $request->price,
+            "description" => $request->description,
+            "tag_id" => $request->tag_id,
+            "onSale" => $request->onSale,
+            "news" => $request->news,
+        ]);
+
+        return $query;
     }
     public function destroy(string $id)
     {

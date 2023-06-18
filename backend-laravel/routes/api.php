@@ -27,6 +27,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::get('/verify/{token}', [AuthController::class, 'verifyEmail'])->name('verify-email');
 });
 
 Route::prefix('users')->group(function () {
@@ -41,6 +43,8 @@ Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index']);
     Route::get('/searchByID/{id}', [ProductController::class, 'show']);
     Route::get('/searchTag/{id}', [ProductController::class, 'searchByTags']);
+    Route::post('/add', [ProductController::class, 'store']);
+    Route::put('/update', [ProductController::class, 'update']);
 });
 
 Route::prefix('tags')->group(function () {
