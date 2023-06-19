@@ -62,6 +62,7 @@ class ProductController extends Controller
     }
     public function destroy(string $id)
     {
-        //
+        $query_delete = DB::table('products')->where('id', $id)->delete();
+        return $query_delete;
     }
 }

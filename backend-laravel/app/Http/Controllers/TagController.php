@@ -14,7 +14,7 @@ class TagController extends Controller
     }
     public function store(Request $request)
     {
-        $query = DB::table('tags')->insert(["name" => $request->nameTag, 'status' => 1]);
+        $query = DB::table('tags')->insert(['name' => $request->nameTag, 'status' => 1]);
         return $query;
     }
     public function show(string $id)
@@ -31,8 +31,8 @@ class TagController extends Controller
     }
     public function destroy(string $id)
     {
-        $tags = DB::table('tags')->where('id', $id)->delete();
-        return $tags;
+        $query_delete = DB::table('tags')->where('id', $id)->delete();
+        return $query_delete;
     }
 }
 

@@ -6,6 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\InfoUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +40,12 @@ Route::prefix('users')->group(function () {
     Route::put('/update', [UserController::class, 'update']);
     Route::put('/changePassword', [UserController::class, 'changePassword']);
     Route::delete('/delete/{id}', [UserController::class, 'destroy']);
+
+        
+    Route::prefix('info')->group(function () {
+        Route::get('/search/{id}', [InfoUserController::class, 'show']);
+        Route::put('/update', [InfoUserController::class, 'update']);
+    });
 });
 
 Route::prefix('products')->group(function () {
@@ -46,6 +54,7 @@ Route::prefix('products')->group(function () {
     Route::get('/searchTag/{id}', [ProductController::class, 'searchByTags']);
     Route::post('/add', [ProductController::class, 'store']);
     Route::put('/update', [ProductController::class, 'update']);
+    Route::delete('/delete/{id}', [ProductController::class, 'destroy']);
 });
 
 Route::prefix('tags')->group(function () {
@@ -54,6 +63,14 @@ Route::prefix('tags')->group(function () {
     Route::post('/addTags', [TagController::class, 'store']);
     Route::put('/update', [TagController::class, 'update']);
     Route::delete('/delete/{id}', [TagController::class, 'destroy']);
+});
+
+Route::prefix('carts')->group(function () {
+    Route::get('/', [CartController::class, 'index']);
+    Route::get('/search/{id}', [CartController::class, 'show']);
+    Route::post('/add', [CartController::class, 'store']);
+    Route::put('/update', [CartController::class, 'update']);
+    Route::delete('/delete/{id}', [CartController::class, 'destroy']);
 });
 
 
