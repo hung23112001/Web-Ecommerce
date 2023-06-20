@@ -12,12 +12,20 @@ class ProductController extends Controller
         $product = DB::table('products')
             ->join('tags', 'products.tag_id', '=', 'tags.id')
             ->select('products.*', 'tags.name as tag_name')
+            ->where('quantity', '>' , '0')
+            ->get();
+        return response()->json($product);
+    }
+    public function getAll()
+    {
+        $product = DB::table('products')
+            ->join('tags', 'products.tag_id', '=', 'tags.id')
+            ->select('products.*', 'tags.name as tag_name')
             ->get();
         return response()->json($product);
     }
     public function store(Request $request)
     {
-        // return $request->product['name'];
         $product_new = $request->product;
         $query = DB::table('products')->insert([
             'name' => $product_new['name'], 
@@ -31,7 +39,6 @@ class ProductController extends Controller
             'news' => $product_new['news'],
         ]);
         return $query;
-
     }
     public function searchByTags(string $id){
         $product = DB::table('products')->where('tag_id', $id)->get();
@@ -44,7 +51,6 @@ class ProductController extends Controller
     }
     public function update(Request $request)
     {
-        // $query = $request->id;
         $query = DB::table('products')
         ->where('id', $request->id)
         ->update([

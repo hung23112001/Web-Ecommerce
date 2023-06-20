@@ -50,6 +50,7 @@ Route::prefix('users')->group(function () {
 
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index']);
+    Route::get('/getAll', [ProductController::class, 'getAll']);
     Route::get('/searchByID/{id}', [ProductController::class, 'show']);
     Route::get('/searchTag/{id}', [ProductController::class, 'searchByTags']);
     Route::post('/add', [ProductController::class, 'store']);
