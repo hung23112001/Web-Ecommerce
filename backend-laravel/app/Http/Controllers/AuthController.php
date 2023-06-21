@@ -27,6 +27,15 @@ class AuthController extends Controller
         if ($query_insert) {
             $dataSendMail = ['title' => "Hi ".$request['username']." !",'token' => $token,];
             Mail::to($request->email)->send(new VerifyAccount($dataSendMail)); 
+
+            $getUser = DB::table('users')->where('email', $request->email)->first();
+            DB::table('info_users')->insert([
+                "user_id" => $getUser->id,
+                'address' => ' ',
+                'telephone' => ' ',
+                "point" => 0,
+                "created_at" => now(),
+            ]);
             return true;
         }
         return false;
@@ -38,7 +47,7 @@ class AuthController extends Controller
             DB::table('users')
                 ->where('id', $user->id)
                 ->update(['email_verified_at' => now(), 'status' => User::STATUS_ACTIVE]);
-            return "Kích hoạt tài khoản thành công. Click vào đường dẫn này để đăng nhập: http://localhost:3000/users/login";
+            return "Kích hoạt tài khoản thành công. Vui lòng quay lại trang trước để cập nhật";
         }
         return "Kích hoạt tài khoản thất bại. Vui lòng thử lại";
     }
@@ -65,5 +74,10 @@ class AuthController extends Controller
     {
         Auth::logout();
         return response()->json(['message' => 'Đăng xuất thành công']);
+    }
+    public function test()
+    {
+        $getID = DB::table('users')->where('email', 'tranhungxtnd882+gggg@gmail.com')->first();
+        return $getID->id;
     }
 }

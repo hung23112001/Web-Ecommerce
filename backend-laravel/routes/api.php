@@ -20,9 +20,9 @@ use App\Http\Controllers\InfoUserController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 
 Route::prefix('auth')->group(function () {
@@ -73,5 +73,8 @@ Route::prefix('carts')->group(function () {
     Route::put('/update', [CartController::class, 'update']);
     Route::delete('/delete/{id}', [CartController::class, 'destroy']);
 });
+
+Route::get('/test123', [AuthController::class, 'test']);
+
 
 
