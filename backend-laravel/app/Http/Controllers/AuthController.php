@@ -16,29 +16,36 @@ class AuthController extends Controller
     public function register(Request $request) 
     {
         $token = Str::random(64);
-        $query_insert = DB::table('users')->insert([
-            "email" => $request->email,
-            "password" => Hash::make($request->password),
-            "role" => User::ROLE_USER, 
-            "username" => $request->username,
-            "status" => User::STATUS_NO_ACTIVE,
-            'token_verify_email' => $token
-        ]);
-        if ($query_insert) {
-            $dataSendMail = ['title' => "Hi ".$request['username']." !",'token' => $token,];
-            Mail::to($request->email)->send(new VerifyAccount($dataSendMail)); 
-
-            $getUser = DB::table('users')->where('email', $request->email)->first();
-            DB::table('info_users')->insert([
-                "user_id" => $getUser->id,
-                'address' => ' ',
-                'telephone' => ' ',
-                "point" => 0,
-                "created_at" => now(),
-            ]);
-            return true;
+        $query_check = DB::table('users')->where('email', 'tranhungxtnd82+gggg@gmail.com')->get();
+        if($query_check) {
+            return false;
         }
-        return false;
+        else {
+            $query_insert = DB::table('users')->insert([
+                "email" => $request->email,
+                "password" => Hash::make($request->password),
+                "role" => User::ROLE_USER, 
+                "username" => $request->username,
+                "status" => User::STATUS_NO_ACTIVE,
+                'token_verify_email' => $token
+            ]);
+            if ($query_insert) {
+                $dataSendMail = ['title' => "Hi ".$request['username']." !",'token' => $token,];
+                Mail::to($request->email)->send(new VerifyAccount($dataSendMail)); 
+    
+                $getUser = DB::table('users')->where('email', $request->email)->first();
+                DB::table('info_users')->insert([
+                    "user_id" => $getUser->id,
+                    'address' => ' ',
+                    'telephone' => ' ',
+                    "point" => 0,
+                    "created_at" => now(),
+                ]);
+                return true;
+            }
+            return false;
+        }
+       
     }
     public function verifyEmail(string $token)
     {
@@ -75,9 +82,11 @@ class AuthController extends Controller
         Auth::logout();
         return response()->json(['message' => 'Đăng xuất thành công']);
     }
-    public function test()
-    {
-        $getID = DB::table('users')->where('email', 'tranhungxtnd882+gggg@gmail.com')->first();
-        return $getID->id;
-    }
+    // public function test()
+    // {
+    //     $query_check = DB::table('users')->where('email', 'tranhungxtnd82+gggg@gmail.com')->get();
+
+    //     $getID = DB::table('users')->where('email', 'tranhungxtnd882+gggg@gmail.com')->first();
+    //     return $query_check;
+    // }
 }
